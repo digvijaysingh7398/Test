@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Quiz with Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+        }
+        h2 {
+            color: #333;
+        }
+        .question {
+            text-align: left;
+            margin: 15px 0;
+        }
+        .options label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            background: green;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: darkgreen;
+        }
+        #timer {
+            font-size: 18px;
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+	<p id="timer">Time Left: <span id="time">10</span> sec</p>
+        <h2>Firstly fill your information then start your test</h2>
+        <input type="text" id="name" placeholder="Enter Your Name" required><br><br><br>
+		<input type="text" id="name" placeholder="Enter Your Father's Name" required><br><br><br>
+		<input type="text" id="name" placeholder="Enter Your Course" required><br><br><br>
+        
+        <form id="quizForm">
+            <div class="question">
+                <p>1. What is the capital of France?</p>
+                <div class="options">
+                    <label><input type="radio" name="q1" value="a"> Berlin</label>
+                    <label><input type="radio" name="q1" value="b"> Madrid</label>
+                    <label><input type="radio" name="q1" value="c"> Paris</label>
+                    <label><input type="radio" name="q1" value="d"> Rome</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>2. Who wrote 'Hamlet'?</p>
+                <div class="options">
+                    <label><input type="radio" name="q2" value="a"> Charles Dickens</label>
+                    <label><input type="radio" name="q2" value="b"> William Shakespeare</label>
+                    <label><input type="radio" name="q2" value="c"> Jane Austen</label>
+                    <label><input type="radio" name="q2" value="d"> Mark Twain</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>3. What is 2 + 2?</p>
+                <div class="options">
+                    <label><input type="radio" name="q3" value="a"> 3</label>
+                    <label><input type="radio" name="q3" value="b"> 4</label>
+                    <label><input type="radio" name="q3" value="c"> 5</label>
+                    <label><input type="radio" name="q3" value="d"> 6</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>4. What is the chemical symbol for gold?</p>
+                <div class="options">
+                    <label><input type="radio" name="q4" value="a"> Ag</label>
+                    <label><input type="radio" name="q4" value="b"> Au</label>
+                    <label><input type="radio" name="q4" value="c"> Pt</label>
+                    <label><input type="radio" name="q4" value="d"> Pb</label>
+                </div>
+            </div>
+
+            <div class="question">
+                <p>5. What is the largest planet in our solar system?</p>
+                <div class="options">
+                    <label><input type="radio" name="q5" value="a"> Earth</label>
+                    <label><input type="radio" name="q5" value="b"> Mars</label>
+                    <label><input type="radio" name="q5" value="c"> Jupiter</label>
+                    <label><input type="radio" name="q5" value="d"> Saturn</label>
+                </div>
+            </div>
+
+            
+            <button type="button" onclick="submitQuiz()">Finished</button>
+        </form>
+
+        <p id="result"></p>
+    </div>
+
+    <script>
+        let timer = 10;
+        let timerInterval = setInterval(() => {
+            document.getElementById("time").innerText = timer;
+            if (timer === 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+            timer--;
+        }, 1000);
+
+        function submitQuiz() {
+            clearInterval(timerInterval);
+
+            let correctAnswers = {
+                q1: "c", q2: "b", q3: "b", q4: "b", q5: "c"
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(correctAnswers).length;
+
+            for (let question in correctAnswers) {
+                let selected = document.querySelector(`input[name="${question}"]:checked`);
+                if (selected && selected.value === correctAnswers[question]) {
+                    score++;
+                }
+            }
+
+            let name = document.getElementById("name").value;
+            document.getElementById("result").innerHTML = `${name}, you scored ${score} out of ${totalQuestions}`;
+
+            // Send data to backend
+            fetch('save_results.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `name=${name}&score=${score}`
+            });
+        }
+    </script>
+
+</body>
+</html>
